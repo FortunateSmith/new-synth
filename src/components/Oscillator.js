@@ -31,12 +31,12 @@ const Oscillator = () => {
   };
 
   const toggleRun = () => {
-    if (running === true) {
-      audioContext.suspend().then(() => {
-        setRunning(false);
-      });
-    } else {
-    }
+    // if (running === true) {
+    //   audioContext.suspend().then(() => {
+    //     // setRunning(false);
+    //   });
+    // } else {
+    // }
   };
 
   const stopAudioContext = () => {
