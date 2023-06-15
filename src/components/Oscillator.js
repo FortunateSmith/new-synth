@@ -7,10 +7,6 @@ const Oscillator = () => {
 
   const [contextCreated, setContextCreated] = useState(false);
 
-  // const [disabledStart, setDisabledStart] = useState(false);
-  // const [disabledStop, setDisabledStop] = useState(true);
-  // const [disabledResSus, setDisabledResSus] = useState(true);
-
   const startAudioContext = () => {
     const newAudioContext = new AudioContext();
     // create oscillator node and gain node
