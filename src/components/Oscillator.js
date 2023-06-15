@@ -4,9 +4,12 @@ const Oscillator = () => {
   const [audioContext, setAudioContext] = useState(null);
   const [gainNode, setGainNode] = useState(null);
   // disable buttons based on audioContext state
-  const [disabledStart, setDisabledStart] = useState(false);
-  const [disabledStop, setDisabledStop] = useState(true);
-  const [disabledResSus, setDisabledResSus] = useState(true);
+
+  const [contextCreated, setContextCreated] = useState(false);
+
+  // const [disabledStart, setDisabledStart] = useState(false);
+  // const [disabledStop, setDisabledStop] = useState(true);
+  // const [disabledResSus, setDisabledResSus] = useState(true);
 
   const startAudioContext = () => {
     const newAudioContext = new AudioContext();
@@ -21,16 +24,14 @@ const Oscillator = () => {
     newGainNode.connect(newAudioContext.destination);
 
     osc.start();
-    setDisabledStart(true);
-    setDisabledResSus(false);
-    setDisabledStop(false);
-
+    setContextCreated(true);
     // pass audioContext to useState to make it available globally in the component
     setAudioContext(newAudioContext);
     setGainNode(newGainNode)
     console.log("GainNode:", gainNode);
     // return;
   };
+
 
   const pauseRes = () => {
     // if audioContext currently is true (exists) and state is running
@@ -41,19 +42,18 @@ const Oscillator = () => {
       
       // set fade from gain value at current time and duration of fade
       gainNode.gain.setValueAtTime(gainNode.gain.value, currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.00001, currentTime + duration);
+      gainNode.gain.exponentialRampToValueAtTime(0.000001, currentTime + duration);
       setTimeout(() => {
         audioContext.suspend()
       }, duration * 1000)
     } else if (audioContext && audioContext.state !== "running") {
-      // gainNode.gain.setValueAtTime(gainNode.gain.value, currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(prevGainVal, currentTime + duration);
+      gainNode.gain.setValueAtTime(gainNode.gain.value, currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(prevGainVal, currentTime + duration)
       setTimeout(() => {
         audioContext.resume()
       }, duration * 1000)
     }
-    console.log("PAUSE", prevGainVal);
-
+    console.log("PAUSE", gainNode);
   };
 
   const stopAudioContext = () => {
@@ -68,9 +68,7 @@ const Oscillator = () => {
     // if audioContext currently is true (exists) and state is running
     setTimeout(() => {
       audioContext.close().then(() => {
-        setDisabledStart(false);
-        setDisabledResSus(true);
-        setDisabledStop(true);
+        setContextCreated(false);
         setAudioContext(null);
         console.log("GainNode:", gainNode);
       });
@@ -82,17 +80,17 @@ const Oscillator = () => {
     <div>
       <button
         id="start-button"
-        disabled={disabledStart}
+        disabled={contextCreated}
         onClick={startAudioContext}
       >
         Start
       </button>
-      <button id="stop-button" disabled={disabledStop} onClick={pauseRes}>
+      <button id="stop-button" disabled={!contextCreated} onClick={pauseRes}>
         Res/Sus
       </button>
       <button
         id="stop-button"
-        disabled={disabledResSus}
+        disabled={!contextCreated}
         onClick={stopAudioContext}
       >
         Stop
